@@ -29,7 +29,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (query === "") { return; }
+    if (query === "") return;
 
     async function getPhotos():Promise<void> {
       try {
@@ -54,7 +54,7 @@ export default function App() {
     setSelectedImageLarge(image.urls.regular);
   };
 
-const closeImageModal = ()=> {
+const closeImageModal = ():void => {
   setSelectedImage(null);
   setSelectedImageLarge(null);
 };
@@ -65,7 +65,7 @@ const closeImageModal = ()=> {
     <div>
       <SearchBar onSearch={handleSearch } />
       {error && <ErrorMessage />}
-      {loading && <Loader />}
+      {loading && <Loader loading={ loading} />}
       {photos.length > 0 && <ImageGallery items={photos} onImageClick={openImageModal} />}
       {photos.length > 0 && !loading && <LoadMoreButton onClick={handleLoadMore} />}
       {selectedImage && <ImageModal isOpen={true} onRequestClose={closeImageModal} image={selectedImage} imageUrlLarge={selectedImageLarge} />}
