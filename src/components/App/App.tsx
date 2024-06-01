@@ -7,34 +7,35 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage"
 import LoadMoreButton from '../LoadMoreBtn/LoadMoreBtn'
 import ImageModal from '../ImageModal/ImageModal'
 import './App.css'
+import { Image } from './App.types'
 
 export default function App() {
-  const [photos, setPhotos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [page, setPage] = useState(1);
-  const [query, setQuery] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedImageLarge, setSelectedImageLarge] = useState(null);
+  const [photos, setPhotos] = useState<Image[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [query, setQuery] = useState<string>("");
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [selectedImageLarge, setSelectedImageLarge] = useState<string | null>(null);
 
-   const handleSearch = async (newQuery) => {
+   const handleSearch = async (newQuery:string):Promise<void> => {
     setQuery(newQuery);
     setPage(1);
     setPhotos([]);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = ():void => {
     setPage(page + 1);
   };
 
   useEffect(() => {
     if (query === "") { return; }
 
-    async function getPhotos() {
+    async function getPhotos():Promise<void> {
       try {
         setError(false);
         setLoading(true);
-        const data = await fetchPhotos(query, page);
+        const data:Image[] = await fetchPhotos(query, page);
         setPhotos((prevPhotos) => {
           return [...prevPhotos, ...data ]
       });
@@ -48,12 +49,12 @@ export default function App() {
     getPhotos();
   }, [page, query]);
 
-  const openImageModal = (imageUrl, imageUrlLarge) => {
-    setSelectedImage(imageUrl);
-    setSelectedImageLarge(imageUrlLarge);
+  const openImageModal = (image:Image):void => {
+    setSelectedImage(image);
+    setSelectedImageLarge(image.urls.regular);
   };
 
-const closeImageModal = () => {
+const closeImageModal = ()=> {
   setSelectedImage(null);
   setSelectedImageLarge(null);
 };
@@ -65,8 +66,9 @@ const closeImageModal = () => {
       <SearchBar onSearch={handleSearch } />
       {error && <ErrorMessage />}
       {loading && <Loader />}
-      {photos.length > 0 && <ImageGallery items={photos} onImageClick={(item) => openImageModal(item.urls.small, item.urls.regular)} />}
+      {photos.length > 0 && <ImageGallery items={photos} onImageClick={openImageModal} />}
       {photos.length > 0 && !loading && <LoadMoreButton onClick={handleLoadMore} />}
-      {selectedImage && <ImageModal isOpen={true} onRequestClose={closeImageModal} imageUrl={selectedImage} imageUrlLarge={selectedImageLarge} />}
+      {selectedImage && <ImageModal isOpen={true} onRequestClose={closeImageModal} image={selectedImage} imageUrlLarge={selectedImageLarge} />}
     </div>
-)}
+  )
+};
